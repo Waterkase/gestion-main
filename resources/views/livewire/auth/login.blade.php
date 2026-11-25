@@ -1,0 +1,72 @@
+<section>
+    @if($modalReset)
+        @include('livewire.auth.reset')
+    @endif
+    @if(session()->has('success')== 'success')
+        @include('livewire.components.success')
+    @endif
+    <div class="page-header">
+        <div class="container m-0">
+            <div class="row mt-2">
+                {{-- <div class="col-xl-6 col-sm-12 col-md-6 col-lg-3 mb-xl-0 pb-4">
+                    <div class="flex items-start justify-start pb-4">
+                        <div class="text-left"><a href="/campamento" wire:navigate class=" text-red-500 mb-0 text-bold text-uppercase text-xl absolute" role="button" aria-pressed="true">Escuela de Base</a></div>
+                    </div>
+                </div> --}}
+                {{-- <div class="col-xl-6 col-sm-12 col-md-6 col-lg-3 mb-xl-0">
+                    <div class="flex items-start justify-start pb-4">
+                        <button type="button" class="btn bg-gradient-primary btn-sm mb-0 font-bold" data-bs-toggle="modal" data-bs-target="#exampleModal">REGISTRATE</button>
+                        <div class="text-right"><a href="/postulacion" wire:navigate class=" text-red-500 mb-0 text-bold text-uppercase text-xl absolute" role="button" aria-pressed="true">Postulate</a></div>
+                    </div>
+                </div> --}}
+            </div>
+            <div class="nav-item p-2 z-40">
+                {{-- <div class="text-left"><a href="/postulacion" wire:navigate class=" text-red-500 mb-0 text-bold text-uppercase absolute" role="button" aria-pressed="true">Escuela de Base</a></div> --}}
+            </div>
+            <div class="row">
+                <div class="col-xl-4 col-lg-5 col-md-6 d-flex flex-column mx-auto">
+                    <div class="card card-plain mt-2">
+                        <div class="card-header pb-0 text-left bg-transparent">
+                            <img src="{{asset('img/logocenso.png')}}" class="navbar-brand-img h-100">
+                        </div>
+                        <div class="card-body">
+                            <form wire:submit="login" action="#" method="POST" role="form text-left">
+                                <div class="mb-3">
+                                    <label class="font-bold" for="email">{{ __('CORREO') }}</label>
+                                    <div class="@error('email')border border-danger rounded-3 @enderror">
+                                        <input wire:model.live="email" id="email" type="email" class="form-control border border-solid text-neutral-900 border-neutral-900 outline-2 font-bold" placeholder="Email" aria-label="Email" aria-describedby="email-addon">
+                                    </div>
+                                    @error('email') <div class="text-danger">{{ $message }}</div> @enderror
+                                </div>
+                                <div class="mb-3">
+                                    <label class="font-bold" for="password">{{ __('CONTRASEÑA') }}</label>
+                                    <div class="@error('password')border border-danger rounded-3 @enderror">
+                                        <input wire:model.live="password" id="password" type="password" class="form-control border border-solid text-neutral-900 border-neutral-900 outline-2 font-bold" placeholder="Password" aria-label="Password" aria-describedby="password-addon">
+                                    </div>
+                                    @error('password') <div class="text-danger">{{ $message }}</div> @enderror
+                                </div>
+                                <div class=" text-end -mt-3">
+                                    <a href="#" wire:click="resetPassword()" class=" text-red-500 text-uppercase font-bold" role="button" aria-pressed="true">¿Olvido la Contraseña?</a>
+                                </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn bg-gradient-danger w-100 mt-4 mb-0 font-bold">{{ __('Ingresar') }}</button>
+                                </div>
+                            </form>
+                            @if ($showFailureLogin)
+                                <div wire:model.live="showFailureLogin" class="mt-3 alert alert-danger alert-dismissible fade show" role="alert">
+                                    <span class="alert-text text-white uppercase">Usuario y Contraseña no validos</span>
+                                    <button wire:click="$set('showFailureLogin', false)" type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><strong>X</strong></button>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="oblique position-absolute top-0 h-100 d-md-block d-none me-n8">
+                        <div class="oblique-image bg-cover position-absolute fixed-top ms-auto h-100 z-index-0 ms-n6" style="background-image:url('../assets/img/curved-images/fondo_login.jpg')"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

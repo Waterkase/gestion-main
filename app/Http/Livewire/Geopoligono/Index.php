@@ -2,16 +2,15 @@
 
 namespace App\Http\Livewire\Geopoligono;
 
-use Livewire\Component;
-
-use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\DB;
 use App\Models\geopoligono;
+use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 
 class Index extends Component
 {
 
 public string $geoJsonPoligonos = '';
+public int $totalPoligonos = 0;
 
     public function mount(): void
     {
@@ -20,6 +19,7 @@ public string $geoJsonPoligonos = '';
 
     public function cargarPoligonos(): void
     {
+        $this->totalPoligonos = geopoligono::whereNotNull('geom')->count();
         // PostGIS construye directamente el FeatureCollection válido en GeoJSON
         $resultado = DB::selectOne("
             SELECT jsonb_build_object(
@@ -42,6 +42,8 @@ public string $geoJsonPoligonos = '';
         ");
 
         $this->geoJsonPoligonos = $resultado->geojson ?? '{"type":"FeatureCollection","features":[]}';
+        
+        $this->dispatch('poligonos-actualizados', geojson: json_decode($this->geoJsonPoligonos));
     }
 
     public function render()

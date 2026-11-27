@@ -3,25 +3,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
-use Clickbar\Magellan\Database\Eloquent\HasPostgisColumns;
+use Clickbar\Magellan\Cast\GeometryCast;
 
 class geopoligono extends Model
-{
-use HasPostgisColumns;
+{ 
 
     protected $table = 'geopoligono';
 
     protected $fillable = [
-        'ComuCircu',
+        'comucircu',
         'geom',
     ];
 
-    protected array $postgisColumns = [
-        'geom' => [
-            'type' => 'geometry',
-            'srid' => 4326,
-        ],
+    protected $casts = [
+        'geom' => GeometryCast::class,
+        
     ];
 
 }

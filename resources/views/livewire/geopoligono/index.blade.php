@@ -3,7 +3,10 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <div class="mb-4 flex justify-between items-center">
-        <h2 class="text-xl font-bold text-gray-800">Visor Territorial - Comunas y Circuitos</h2>
+        <div>
+            <h2 class="text-xl font-bold text-gray-800">Visor Territorial - Comunas y Circuitos</h2>
+            <p class="text-sm text-gray-500">Polígonos cargados: <span class="font-semibold">{{ $totalPoligonos }}</span></p>
+        </div>
         <button
             type="button"
             wire:click="cargarPoligonos"
@@ -15,6 +18,56 @@
     <!-- Contenedor protegido con wire:ignore -->
     <div wire:ignore>
         <div id="mapa-gis" style="height: 600px; width: 100%; border-radius: 8px; z-index: 1;"></div>
+    </div>
+
+    <!-- Ventana emergente (modal) al seleccionar un polígono -->
+    <div
+        id="modal-poligono"
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-poligono-titulo"
+    >
+        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <div class="flex items-start justify-between border-b pb-3">
+                <div>
+                    <span class="text-xs font-semibold uppercase tracking-wide text-blue-600">
+                        Registro de Tabla: geopoligono
+                    </span>
+                    <h3 id="modal-poligono-titulo" class="text-lg font-bold text-gray-900">
+                        Detalle del Geopolígono
+                    </h3>
+                </div>
+                <button
+                    type="button"
+                    id="cerrar-modal-poligono"
+                    class="rounded px-2 py-1 text-sm font-semibold text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                >
+                    ✕
+                </button>
+            </div>
+
+            <div class="mt-4 space-y-2.5 text-sm">
+                <div class="flex justify-between gap-4 border-b border-gray-100 pb-2">
+                    <span class="font-medium text-gray-500">ID:</span>
+                    <span id="detalle-id" class="font-mono font-semibold text-gray-900">-</span>
+                </div>
+                <div class="flex justify-between gap-4 border-b border-gray-100 pb-2">
+                    <span class="font-medium text-gray-500">Comuna:</span>
+                    <span id="detalle-comucircu" class="text-right font-semibold text-gray-900">-</span>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button
+                    type="button"
+                    id="btn-aceptar-modal"
+                    class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                >
+                    Cerrar
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Script de Leaflet -->
@@ -29,6 +82,38 @@
             }).addTo(map);
 
             let capaPoligonos = null;
+            let poligonoSeleccionado = null;
+
+            const modal = document.getElementById('modal-poligono');
+            const detalleId = document.getElementById('detalle-id');
+            const detallecomucircu = document.getElementById('detalle-comucircu');
+
+
+            function abrirVentanaPoligono(props) {
+                detalleId.textContent = props.id ?? 'N/A';
+                detallecomucircu.textContent = props.comucircu ?? 'Sin nombre';
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            function cerrarVentanaPoligono() {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+
+                if (poligonoSeleccionado && capaPoligonos) {
+                    capaPoligonos.resetStyle(poligonoSeleccionado);
+                    poligonoSeleccionado = null;
+                }
+            }
+
+            document.getElementById('cerrar-modal-poligono').addEventListener('click', cerrarVentanaPoligono);
+            document.getElementById('btn-aceptar-modal').addEventListener('click', cerrarVentanaPoligono);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    cerrarVentanaPoligono();
+                }
+            });
 
             function estiloPoligono(feature) {
                 return {
@@ -41,35 +126,64 @@
                 };
             }
 
+            function estiloSeleccionado() {
+                return {
+                    fillColor: '#f59e0b',
+                    weight: 3,
+                    opacity: 1,
+                    color: '#b45309',
+                    dashArray: '',
+                    fillOpacity: 0.55
+                };
+            }
+
             function enCadaPoligono(feature, layer) {
-                if (feature.properties && feature.properties.ComuCircu) {
-                    layer.bindPopup(`
-                        <div class="p-1">
-                            <span class="text-xs text-gray-500 uppercase font-semibold">Comuna / Circuito</span>
-                            <p class="text-sm font-bold text-gray-900">${feature.properties.ComuCircu}</p>
-                        </div>
-                    `);
-                }
+                const props = feature.properties || {};
+                const nombre = props.comucircu || 'Sin nombre';
+
+                // Ventana flotante rápida al posicionarse sobre el polígono
+                layer.bindTooltip(
+                    `<div><strong>${nombre}</strong><br><span style="font-size:11px;">Clic para ver detalles</span></div>`,
+                    { sticky: true, direction: 'top' }
+                );
 
                 layer.on({
                     mouseover: function (e) {
                         const target = e.target;
-                        target.setStyle({
-                            weight: 3,
-                            color: '#f59e0b',
-                            fillOpacity: 0.6
-                        });
+                        if (target !== poligonoSeleccionado) {
+                            target.setStyle({
+                                weight: 3,
+                                color: '#f59e0b',
+                                fillOpacity: 0.6
+                            });
+                        }
                         target.bringToFront();
                     },
                     mouseout: function (e) {
-                        if (capaPoligonos) {
-                            capaPoligonos.resetStyle(e.target);
+                        const target = e.target;
+                        if (capaPoligonos && target !== poligonoSeleccionado) {
+                            capaPoligonos.resetStyle(target);
                         }
+                    },
+                    click: function (e) {
+                        L.DomEvent.stopPropagation(e);
+
+                        if (poligonoSeleccionado && capaPoligonos && poligonoSeleccionado !== e.target) {
+                            capaPoligonos.resetStyle(poligonoSeleccionado);
+                        }
+
+                        poligonoSeleccionado = e.target;
+                        poligonoSeleccionado.setStyle(estiloSeleccionado());
+                        poligonoSeleccionado.bringToFront();
+
+                        abrirVentanaPoligono(props);
                     }
                 });
             }
 
             function renderizarCapa(geoJsonData) {
+                cerrarVentanaPoligono();
+
                 if (capaPoligonos) {
                     map.removeLayer(capaPoligonos);
                 }
@@ -84,10 +198,8 @@
                 }
             }
 
-            // Carga inicial
             renderizarCapa(@json(json_decode($geoJsonPoligonos)));
 
-            // Actualización dinámica cuando se dispara 'poligonos-actualizados' desde Livewire
             Livewire.on('poligonos-actualizados', ({ geojson }) => {
                 renderizarCapa(geojson);
             });

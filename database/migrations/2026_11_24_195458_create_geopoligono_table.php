@@ -14,6 +14,7 @@ public function up(): void
         Schema::create('geopoligono', function (Blueprint $table) {
             $table->id();
             $table->string('comucircu');
+            $table->string('parroquia');
             // Usamos geometry (o multiPolygon/polygon) con SRID 4326 para compatibilidad total con Leaflet y QGIS
             $table->magellanGeometry('geom', 4326);
             $table->timestamps();

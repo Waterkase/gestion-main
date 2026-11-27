@@ -7,12 +7,7 @@
             <h2 class="text-xl font-bold text-gray-800">Visor Territorial - Comunas y Circuitos</h2>
             <p class="text-sm text-gray-500">Polígonos cargados: <span class="font-semibold">{{ $totalPoligonos }}</span></p>
         </div>
-        <button
-            type="button"
-            wire:click="cargarPoligonos"
-            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
-            Actualizar Capa
-        </button>
+        <button type="button" wire:click="cargarPoligonos" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Actualizar Capa</button>
     </div>
 
     <!-- Contenedor protegido con wire:ignore -->
@@ -21,30 +16,14 @@
     </div>
 
     <!-- Ventana emergente (modal) al seleccionar un polígono -->
-    <div
-        id="modal-poligono"
-        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modal-poligono-titulo"
-    >
+    <div id="modal-poligono" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="modal-poligono-titulo">
         <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
             <div class="flex items-start justify-between border-b pb-3">
                 <div>
-                    <span class="text-xs font-semibold uppercase tracking-wide text-blue-600">
-                        Registro de Tabla: geopoligono
-                    </span>
-                    <h3 id="modal-poligono-titulo" class="text-lg font-bold text-gray-900">
-                        Detalle del Geopolígono
-                    </h3>
+                    <span class="text-xs font-semibold uppercase tracking-wide text-blue-600">Registro de Tabla: geopoligono</span>
+                    <h3 id="modal-poligono-titulo" class="text-lg font-bold text-gray-900">Detalle del Geopolígono</h3>
                 </div>
-                <button
-                    type="button"
-                    id="cerrar-modal-poligono"
-                    class="rounded px-2 py-1 text-sm font-semibold text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                >
-                    ✕
-                </button>
+                <button type="button" id="cerrar-modal-poligono" class="rounded px-2 py-1 text-sm font-semibold text-gray-500 hover:bg-gray-100 hover:text-gray-800">✕</button>
             </div>
 
             <div class="mt-4 space-y-2.5 text-sm">
@@ -59,13 +38,7 @@
             </div>
 
             <div class="mt-6 flex justify-end">
-                <button
-                    type="button"
-                    id="btn-aceptar-modal"
-                    class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                >
-                    Cerrar
-                </button>
+                <button type="button" id="btn-aceptar-modal" class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">Cerrar</button>
             </div>
         </div>
     </div>
